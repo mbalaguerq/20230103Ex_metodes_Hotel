@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace _20230103Ex_metodes_Hotel
     internal class Aplicacio
     {
 
-        
+
         public void Inici()
         {
             String[,] hotel = DadesHotel();
@@ -40,7 +41,7 @@ namespace _20230103Ex_metodes_Hotel
             {
                 Console.Write("Sel.lecciona opció: ");
                 opcio = Console.ReadLine();
-            } while (!"01234567".Contains(opcio));
+            } while (!"0123456789".Contains(opcio));
             return opcio;
         }
 
@@ -54,10 +55,21 @@ namespace _20230103Ex_metodes_Hotel
                     break;
                 case "2":
                     AltaClients(clients);
-                    break; 
-                case "3":
-                    MostrarHotel(hotel);
                     break;
+                case "3":
+                    //Mostrar  habitacions Hotel
+                    MostrarHotel(hotel, clients, false);//pasem els dos arrays i un false
+                    break;
+                case "4":
+                    MostrarLliures(hotel);
+                    break;
+                case "5":
+                    MostrarOcupades(hotel, clients, false);
+                    break;
+                case "6":
+                    EntrarReserva(hotel, clients);
+                    break;
+
                 case "0":
                     salir = true;
                     break;
@@ -66,18 +78,17 @@ namespace _20230103Ex_metodes_Hotel
             return salir;
         }
 
-       
+
 
         void AltaClients(String[,] clients)
         {
             string dniClient;
             dniClient = DemanaClient();
-            //bool encontrado = false;
             int fila;
             fila = existsNif(dniClient, clients);
             string nomCLient;
             string mailCLient;
-            int filaLliure= getNewFilaClientes(clients);
+            int filaLliure = getNewFilaClientes(clients);
 
             if (fila != REGISTRE_INEXISTENT)
             {
@@ -93,41 +104,41 @@ namespace _20230103Ex_metodes_Hotel
                 mailCLient = Console.ReadLine();
                 clients[filaLliure, CLI_MAIL] = mailCLient;
             }
-            
-           /* while (fila < clients.GetLength(0) & !encontrado)
-            {
-                if (user.Equals(clients[fila, CLI_NIF]))
-                {
-                    encontrado = true;
 
-                }
-                fila++;
-            }
-            if (encontrado)
-            {
-                Console.WriteLine("El client ja té habitació assignada");
-            }
-            else
-            {
-                clients[fila, CLI_NIF] = dniClient;
-                Console.WriteLine("Introdueix el nom del client: ");
-                nomCLient= Console.ReadLine();
-                clients[fila, CLI_NOM] = nomCLient;
-                Console.WriteLine("Introdueix el e-mail del client: ");
-                mailCLient= Console.ReadLine();
-                clients[fila, CLI_MAIL] = mailCLient;
-            }*/
+            /* while (fila < clients.GetLength(0) & !encontrado)
+             {
+                 if (user.Equals(clients[fila, CLI_NIF]))
+                 {
+                     encontrado = true;
+
+                 }
+                 fila++;
+             }
+             if (encontrado)
+             {
+                 Console.WriteLine("El client ja té habitació assignada");
+             }
+             else
+             {
+                 clients[fila, CLI_NIF] = dniClient;
+                 Console.WriteLine("Introdueix el nom del client: ");
+                 nomCLient= Console.ReadLine();
+                 clients[fila, CLI_NOM] = nomCLient;
+                 Console.WriteLine("Introdueix el e-mail del client: ");
+                 mailCLient= Console.ReadLine();
+                 clients[fila, CLI_MAIL] = mailCLient;
+             }*/
 
 
 
         }
-        int getNewFilaClientes(String[,] clientes) 
+        int getNewFilaClientes(String[,] clientes)
         {
             bool encontrado = false;
             int filaLliure = 0;
             while (filaLliure < clientes.GetLength(0) & !encontrado)
             {
-                if (clientes[filaLliure, ID_CLIENT].Equals ("")) 
+                if (clientes[filaLliure, ID_CLIENT].Equals(""))
                 {
                     encontrado = true;
                 }
@@ -146,7 +157,7 @@ namespace _20230103Ex_metodes_Hotel
             }
         }
 
-        int existsNif (String user, String [,] clients)
+        int existsNif(String user, String[,] clients)
         {
             bool encontrado = false;
             int fila = 0;
@@ -155,7 +166,7 @@ namespace _20230103Ex_metodes_Hotel
                 if (user.Equals(clients[fila, CLI_NIF]))
                 {
                     encontrado = true;
-                    
+
                 }
                 fila++;
             }
@@ -178,26 +189,65 @@ namespace _20230103Ex_metodes_Hotel
             return dniClient;
         }
 
-        void MostrarHotel(String[,] hotel)
+        //rep dos arrays i un boleano. En la opció 3 false en la segona true.
+        void MostrarHotel(String[,] hotel, string[,] clients, bool mostrarnombre)
         {
             Console.WriteLine("\nNum Hab\tPis\tN Llits\tPreu\tDni Client");
-
+            //recorrem l'array hotel
             for (int i = 0; i < hotel.GetLength(0); i++)
             {
                 for (int j = 0; j < hotel.GetLength(1); j++)
                 {
-                    if (hotel[i, j] != null)
+
+                    //si a l'array hotel, el que troba no es null i el boolean es fals (no mostrarnom)
+                    if (hotel[i, j] != null & !mostrarnombre)
                     {
+                        //escriu el que surti
                         Console.Write(hotel[i, j] + "\t");
                     }
-                    else
+                    //si no si a l'array hotel, el que troba no es null i el boolean es true (hem de  mostrarnom)
+                    else if (hotel[i, j] != null & mostrarnombre)
                     {
+                        //si la columna jo no es la columna 4(hot_nif)
+                        if (j != HOT_NIF)
+                        //escriu el que hi hagi
+                        {
+                            Console.Write(hotel[i, j] + "\t");
+                            //si no, es a dir, a la columna 4, fem una búsqueda a l'array clients
+                        }
+                        else
+                        {
+                            bool encontrado = false;
+                            int fila = 0;
+
+                            //si a la búsqueda trobem que els valors de HOT_NIF I CLI_NIF COINCIDEIXEN
+                            while (fila < clients.GetLength(0) & !encontrado)
+                            {
+                                if (hotel[i, HOT_NIF] == clients[fila, CLI_NIF])
+                                {
+                                    encontrado = true;//ENCONTRADO TRUE
+                                }
+                                else// SI NO ES ENCONTRADO ES QUE NO L'HA TROBAT I HA DE SEGUIR RECORRENT
+                                {
+                                    fila++;
+                                }
+                            }
+                            if (encontrado)//SI L'HA TROBAT
+                            {//ESCRIU A L'ARRAY CLIENTS A LA POSICIÓ 4(CLI_NOM) EL QUE HAGIS TROBAT
+                                Console.Write(clients[fila, CLI_NOM]);
+                            }
+
+                        }
+                    }
+                    else
+                    {//SI ES NULL MOSTRA LIBRE
                         Console.Write("Libre");
                     }
-                    
+
                 }
                 Console.WriteLine();
             }
+            Console.WriteLine();
         }
 
         void MostrarClients(String[,] clients)
@@ -212,19 +262,82 @@ namespace _20230103Ex_metodes_Hotel
                     {
                         Console.Write(clients[i, j] + "\t");
                     }
-                    
+
                 }
                 if (clients[i, 0] != "")
                 {
                     Console.WriteLine();
                 }
-                
+
             }
             Console.WriteLine();
         }
 
-        string[,] DadesHotel()
+        void MostrarLliures(String[,] hotel)
         {
+            Console.WriteLine("\nNum Hab\tPis\tN Llits");
+            //recorrem l'array hotel
+            for (int i = 0; i < hotel.GetLength(0); i++)
+            {
+                
+                    
+                 if(hotel[i, HOT_NIF] == null )
+                    {
+                        Console.WriteLine(hotel[i, 0] + "\t" + hotel[i, 1] + "\t" + hotel[i, 2] + "\t");
+              
+                    }
+                    
+            }
+            
+        }
+        void MostrarOcupades(String[,] hotel, String[,] clients, bool encontrado)
+        {
+            Console.WriteLine("\n Num Hab\tPis \t N Llits\t Preu \t Nom Client");
+            //recorrem l'array hotel
+            for (int i = 0; i < hotel.GetLength(0); i++)
+            {
+                if (hotel[i, HOT_NIF] != null)
+                {
+                    Console.Write("   " + hotel[i, HOT_HAB] + " \t\t " + hotel[i, HOT_PIS] + " \t " + hotel[i, HOT_LLIT] + " \t\t " + hotel[i, HOT_PREU] + " \t ");
+
+                    int fila = 0;
+                    //si a la búsqueda trobem que els valors de HOT_NIF I CLI_NIF COINCIDEIXEN
+                    while (fila < clients.GetLength(0) & !encontrado)
+                    {
+                        if (hotel[i, HOT_NIF] == clients[fila, CLI_NIF])
+                        {
+
+                            encontrado = true;//ENCONTRADO TRUE
+                        }
+                        else// SI NO ES ENCONTRADO ES QUE NO L'HA TROBAT I HA DE SEGUIR RECORRENT
+                        {
+                            fila++;
+                        }
+                    }
+                    if (encontrado)//SI L'HA TROBAT
+                    {//ESCRIU A L'ARRAY CLIENTS A LA POSICIÓ 4(CLI_NOM) EL QUE HAGIS TROBAT
+                        Console.WriteLine(clients[fila, CLI_NOM]);
+                    }
+                    
+
+                }
+
+            }
+        }
+
+        
+
+
+
+
+
+
+
+
+
+            string[,] DadesHotel()
+        {
+
 
             String[,] hotel = {
             //num hab/ pis/ n llits/ preu/ null o dni pers
@@ -241,11 +354,11 @@ namespace _20230103Ex_metodes_Hotel
             {"205", "2", "3", "130", null},
             {"206", "2", "1", "75",  null},
             {"301", "3", "2", "100", null},
-            {"302", "3", "2", "100", "55555555E"},
+            {"302", "3", "2", "100", null},
             {"303", "3", "2", "100", null},
             {"304", "3", "3", "130", null},
-            {"305", "3", "3", "130", "12345678G"},
-            {"306", "3", "1", "75", "45644056g"}};
+            {"305", "3", "3", "130", null},
+            {"306", "3", "1", "75",  null}};
             return hotel;
         }
 
@@ -268,7 +381,7 @@ namespace _20230103Ex_metodes_Hotel
             {"55555555E", "Isabel Casas", "isacasas@hotmail.com", },
             {"33333333C", "Albert Gonzalez", "gonzalbert@icloud.com", },
             {"55555555E", "Isabel Casas", "isacasas@hotmail.com", } };
-            
+
             return clients;
         }
 
@@ -278,9 +391,11 @@ namespace _20230103Ex_metodes_Hotel
             Console.WriteLine("2. Alta clients");
             Console.WriteLine("3. Mostrar  habitacions Hotel");
             Console.WriteLine("4. Mostrar habitacions lliures");
-            Console.WriteLine("5. Mostrar habitacions ocupades amb el nom");         
-            //Console.WriteLine("6. Factura de la reserva a partir d'un Nif");
-            //Console.WriteLine("7. Anul·lar reserva");
+            Console.WriteLine("5. Mostrar habitacions ocupades amb el nom");
+            Console.WriteLine("6. Entrar reserva");
+            Console.WriteLine("7. Llista de reserves a partir d'un Nif");
+            Console.WriteLine("8. Factura de la  reserva a partir d'un Nif");
+            Console.WriteLine("9. Anul.lar reserva");
             Console.WriteLine("0. Sortir");
         }
 
@@ -290,5 +405,12 @@ namespace _20230103Ex_metodes_Hotel
         const int CLI_MAIL = 2;
         const int REGISTRE_INEXISTENT = -1;
         const int ID_CLIENT = 0;
+
+        //num hab/ pis/ n llits/ preu/ null o dni pers
+        const int HOT_HAB = 0;
+        const int HOT_PIS = 1;
+        const int HOT_LLIT = 2;
+        const int HOT_PREU = 3;
+        const int HOT_NIF = 4;
     }
 }
