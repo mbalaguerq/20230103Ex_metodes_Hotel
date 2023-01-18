@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace _20230103Ex_metodes_Hotel
@@ -181,7 +182,7 @@ namespace _20230103Ex_metodes_Hotel
 
         }
 
-        string DemanaClient()
+        public string DemanaClient()
         {
             string dniClient;
             Console.Write("Introdueix Dni del CLient: ");
@@ -325,7 +326,68 @@ namespace _20230103Ex_metodes_Hotel
             }
         }
 
-        
+
+
+        void EntrarReserva(String[,] hotel, String[,] clients)
+        {
+            string nHab;
+            string tipusHab;
+            string nifClient;
+            int filaClient;
+            int count=0;
+
+
+            Console.WriteLine("Sel.leccioni el nº d'habitacions que desitja: ");
+            nHab = Console.ReadLine();
+            Console.WriteLine("Sel.leccioni el tipus d'habitació: ");
+            Console.Write("-1 Simple\t" + "2-doble\t" + "3-Triple\t");
+            tipusHab = Console.ReadLine();
+            //Mètode recórrer l'array.
+            
+            for (int fila = 0; fila < hotel.GetLength(0); fila++)
+            {
+                //si a la búsqueda trobem que els valors de HOT_HAB I tipusHab COINCIDEIXEN
+                if ((hotel[fila, HOT_LLIT] == tipusHab) & (hotel[fila, HOT_NIF] == null))
+                {
+                    count++;
+                }
+            }
+            if (count <= int.Parse(nHab) & count > 0)
+            {
+                Console.WriteLine("No hi ha suficients habitacions disponibles del tipus escollit");
+            }
+            else
+            {
+                nifClient = DemanaClient();
+                filaClient = existsNif(nifClient, clients);
+                if (filaClient != REGISTRE_INEXISTENT)
+                {
+                    Console.WriteLine("Benvingut senyor" + clients[filaClient, CLI_NOM]);
+                }
+                else
+                {
+                    
+                    int filaLliure;
+                    filaLliure= getNewFilaClientes(clients);
+
+                    if (filaLliure == REGISTRE_INEXISTENT) 
+                    {
+                        Console.WriteLine("No hi ha espai a la memòria. Avisa al tècnic");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Introdueix el nom del client: ");
+                        string nomClient =Console.ReadLine();
+                        Console.WriteLine("Introdueix el email del client: ");
+                        string mailClient = Console.ReadLine();
+                        clients[filaLliure, CLI_NOM] = nomClient;
+                        clients[filaLliure, CLI_NIF]= nifClient;
+                        clients[filaLliure,CLI_MAIL]= mailClient;
+                        MostrarClients(clients);                       
+                    }
+                }
+            }
+        }
 
 
 
@@ -335,7 +397,7 @@ namespace _20230103Ex_metodes_Hotel
 
 
 
-            string[,] DadesHotel()
+        string[,] DadesHotel()
         {
 
 
