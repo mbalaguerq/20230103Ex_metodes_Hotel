@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace _20230103Ex_metodes_Hotel
@@ -29,9 +30,6 @@ namespace _20230103Ex_metodes_Hotel
 
             } while (!salir);
             Console.WriteLine();
-
-
-
         }
 
         string DemanarOpcioMenu()
@@ -181,7 +179,7 @@ namespace _20230103Ex_metodes_Hotel
 
         }
 
-        string DemanaClient()
+        public string DemanaClient()
         {
             string dniClient;
             Console.Write("Introdueix Dni del CLient: ");
@@ -279,16 +277,16 @@ namespace _20230103Ex_metodes_Hotel
             //recorrem l'array hotel
             for (int i = 0; i < hotel.GetLength(0); i++)
             {
-                
-                    
-                 if(hotel[i, HOT_NIF] == null )
-                    {
-                        Console.WriteLine(hotel[i, 0] + "\t" + hotel[i, 1] + "\t" + hotel[i, 2] + "\t");
-              
-                    }
-                    
+
+
+                if (hotel[i, HOT_NIF] == null)
+                {
+                    Console.WriteLine(hotel[i, 0] + "\t" + hotel[i, 1] + "\t" + hotel[i, 2] + "\t");
+
+                }
+
             }
-            
+
         }
         void MostrarOcupades(String[,] hotel, String[,] clients, bool encontrado)
         {
@@ -318,24 +316,96 @@ namespace _20230103Ex_metodes_Hotel
                     {//ESCRIU A L'ARRAY CLIENTS A LA POSICIÓ 4(CLI_NOM) EL QUE HAGIS TROBAT
                         Console.WriteLine(clients[fila, CLI_NOM]);
                     }
-                    
+
 
                 }
 
             }
         }
 
-        
 
 
+        void EntrarReserva(String[,] hotel, String[,] clients)
+        {
+            string nHab;
+            string tipusHab;
+            string nifClient;
+            int filaClient;
+            int count = 0;
 
 
+            Console.WriteLine("Sel.leccioni el nº d'habitacions que desitja: ");
+            nHab = Console.ReadLine();
+            Console.WriteLine("Sel.leccioni el tipus d'habitació: ");
+            Console.Write("-1 Simple\t" + "2-doble\t" + "3-Triple\t");
+            tipusHab = Console.ReadLine();
+
+            //Mètode recórrer l'array.
+            //Busquem si hi ha habitacions lliures
+            for (int fila = 0; fila < hotel.GetLength(0); fila++)
+            {
+                //si a la búsqueda trobem que els valors de HOT_HAB I tipusHab COINCIDEIXEN
+                if ((hotel[fila, HOT_LLIT] == tipusHab) & (hotel[fila, HOT_NIF] == null))
+                {
+                    count++;//el count ens diu cuantes hab. lliures hi ha
+                }
+            }
+            if (count < int.Parse(nHab))//si hi ha menys hab lliures de les sol.licitades
+            {
+                Console.WriteLine("No hi ha suficients habitacions disponibles del tipus escollit");
+            }
+            else//si hi ha suficients hab lliures
+            {
+                nifClient = DemanaClient();//demana el nif
+                filaClient = existsNif(nifClient, clients);//mira si existeix al array clients i en quina fila
+                if (filaClient != REGISTRE_INEXISTENT)//si existeix,
+                {
+                    Console.WriteLine("Benvingut senyor" + clients[filaClient, CLI_NOM]);
+                }
+                else//si el client no existeix
+                {
+
+                    int filaLliure;
+                    filaLliure = getNewFilaClientes(clients);//busca una fila lliure al array clients
+
+                    if (filaLliure == REGISTRE_INEXISTENT) //si no hi ha files lliures
+                    {
+                        Console.WriteLine("No hi ha espai a la memòria. Avisa al tècnic");
+                    }
+                    else //si hi ha files llliures
+                    {
+                        Console.WriteLine("Introdueix el nom del client: ");
+                        string nomClient = Console.ReadLine();
+                        Console.WriteLine("Introdueix el email del client: ");
+                        string mailClient = Console.ReadLine();
+                        //omplim l'array clients amb les dades obtingudes i el mostrem
+                        clients[filaLliure, CLI_NOM] = nomClient;
+                        clients[filaLliure, CLI_NIF] = nifClient;
+                        clients[filaLliure, CLI_MAIL] = mailClient;
+                        MostrarClients(clients);
+                    }
+
+                }
+                int countHab = 0;
+                int fila = 0;
+
+                //busquem les hab lliures i hi introduim les dades de client
+                while (fila < hotel.GetLength(0) & countHab < int.Parse(nHab))
+                {
+                    if (hotel[fila, HOT_NIF] == null & hotel[fila, HOT_LLIT] == tipusHab)
+                    {
+                        hotel[fila, HOT_NIF] = nifClient;
+                        countHab++;
+
+                    }
+                    fila++;
+                }
+                MostrarHotel(hotel, clients, false);
+            }
+        }
 
 
-
-
-
-            string[,] DadesHotel()
+        string[,] DadesHotel()
         {
 
 
