@@ -67,6 +67,12 @@ namespace _20230103Ex_metodes_Hotel
                 case "6":
                     EntrarReserva(hotel, clients);
                     break;
+                case "7":
+                    LlistaReserves(hotel);
+                    break;
+                case "8":
+                    Factura(hotel, clients);
+                    break;
 
                 case "0":
                     salir = true;
@@ -166,7 +172,10 @@ namespace _20230103Ex_metodes_Hotel
                     encontrado = true;
 
                 }
-                fila++;
+                else
+                {
+                    fila++;
+                }
             }
             if (encontrado)
             {
@@ -323,8 +332,6 @@ namespace _20230103Ex_metodes_Hotel
             }
         }
 
-
-
         void EntrarReserva(String[,] hotel, String[,] clients)
         {
             string nHab;
@@ -403,6 +410,80 @@ namespace _20230103Ex_metodes_Hotel
                 MostrarHotel(hotel, clients, false);
             }
         }
+
+        void LlistaReserves(String[,] hotel)
+        {
+            string client;
+
+            client = DemanaClient();
+            int count = 0;
+
+            Console.WriteLine("\nNum Hab\tPis\tN Llits\tPreu");
+            //recorrem l'array hotel
+            for (int i = 0; i < hotel.GetLength(0); i++)
+            {
+                if (hotel[i, HOT_NIF] == client)
+                {
+                    Console.WriteLine(hotel[i, HOT_HAB] + "\t" + hotel[i, HOT_PIS] + "\t" + hotel[i, HOT_LLIT] + "\t" + hotel[i, HOT_PREU] + "\t");
+                    count++;
+                }
+
+            }
+            if (count == 0)
+            {
+                Console.WriteLine("No hi ha cap client amb aquestes dades.");
+            }
+
+        }
+
+        void Factura(String[,] hotel, String[,] clients)
+        {
+            string client;
+            int fila;
+
+            client = DemanaClient();//Demanem Dni
+            fila = existsNif(client, clients);//busquem si existeix al array clients
+
+            if (fila == REGISTRE_INEXISTENT)//si el client no existeix mostrem missatge
+            {
+                Console.WriteLine("No hi ha cap client amb aquest DNI registrat");
+            }
+            //Si el client existeix                     
+            else
+            {
+                Console.WriteLine("\nNum Hab\tPis\tN Llits\tPreu");
+                int suma = 0;
+                int count = 0;
+                //Random rand = new Random();
+                //recorrem l'array hotel
+                for (int i = 0; i < hotel.GetLength(0); i++)
+                {
+                    if (hotel[i, HOT_NIF] == client)
+                    {
+                        Console.WriteLine(hotel[i, HOT_HAB] + "\t" + hotel[i, HOT_PIS] + "\t" + hotel[i, HOT_LLIT] + "\t" + hotel[i, HOT_PREU] + "\t");
+                        count++;
+                        suma += int.Parse(hotel[i, HOT_PREU]);
+                    }
+                }
+                if (count == 0)
+                {
+                    Console.WriteLine("No hi ha cap client amb aquestes dades.");
+                }
+                //anem a fer factura
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Hotel Ilerna Nif:65478912B");
+                Console.WriteLine("Sr/Sra. " + clients[fila, CLI_NOM]);
+                Console.WriteLine("NIF: " + clients[fila, CLI_NIF]);
+                //Console.WriteLine("Nº Factura" + rand);
+                Console.WriteLine("PREU TOTAL: " + suma);
+                Console.WriteLine();
+            }
+        }
+
+
+
+
 
 
         string[,] DadesHotel()
